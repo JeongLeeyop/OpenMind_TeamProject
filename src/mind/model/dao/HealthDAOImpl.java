@@ -1,5 +1,6 @@
 package mind.model.dao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class HealthDAOImpl implements HealthDAO {
 
 	@Override
 	public int insertMember(MemberDTO member) throws SQLException {
-		// TODO Auto-generated method stub
+		Connection con = null;
 		return 0;
 	}
 
