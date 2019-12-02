@@ -2,7 +2,8 @@ package mind.model.dto;
 
 public class GymDTO {
 	private int code;  //gym PK 시퀀스라 인트로 선언
-	private String MemberId; //유저 아이디 
+	
+	private String name;//헬스장 이름
 	private String addr;  //헬스장 주소
 	private String PhoneNum; //헬스장 전화번호
 	private String fileName; //헬스장 사진올릴 때 사용할 사진 이름
@@ -21,11 +22,12 @@ public class GymDTO {
 	/**
 	 * 모든 필드를 사용하는 GymDTO 생성자
 	 * */
-	public GymDTO(int code, String memberId, String addr, String phoneNum, String fileName, int gymCapacity, int price,
+	public GymDTO(int code,String name, String addr, String phoneNum, String fileName, int gymCapacity, int price,
 			String comment, String weekdayHour, String weekendHour, double avgScore) {
 		super();
 		this.code = code;
-		MemberId = memberId;
+		
+		this.name = name;
 		this.addr = addr;
 		PhoneNum = phoneNum;
 		this.fileName = fileName;
@@ -52,13 +54,7 @@ public class GymDTO {
 		this.code = code;
 	}
 
-	public String getMemberId() {
-		return MemberId;
-	}
-
-	public void setMemberId(String memberId) {
-		MemberId = memberId;
-	}
+	
 
 	public String getAddr() {
 		return addr;
@@ -132,7 +128,13 @@ public class GymDTO {
 		this.avgScore = avgScore;
 	}
 
+	public String getName() {
+		return name;
+	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	
 	

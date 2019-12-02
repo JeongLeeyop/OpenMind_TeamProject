@@ -1,5 +1,6 @@
 package mind.model.dao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -40,9 +41,19 @@ public interface HealthDAO {
 	//////////////////////////////////////////////////////////////////////////
 	
 	/**
+	 * 포인트 레코드 초기화
+	 * */
+	public int insertPoint(String memberId, Connection con) throws SQLException;
+	
+	/**
 	 * 포인트 잔액 갱신
 	 * */
-	int updatePoint(String memberId) throws SQLException;
+	int updatePoint(String memberId, int price) throws SQLException;
+		
+	/**
+	 * 회원 포인트 사용 및 사업자 포인트 적립
+	 * */
+	int updatePoint(String memberId, int gymCode, int price) throws SQLException;
 	
 	/**
 	 * 포인트 잔액 출력
@@ -91,7 +102,7 @@ public interface HealthDAO {
 	/**
 	 * 리뷰 삭제
 	 * */
-	int deleteReview(int reviewCode) throws SQLException;
+	int deleteReview(int reviewCode, String memberId) throws SQLException;
 	
 	/////////////////////////////////////////////////////////////////////
 	
@@ -114,7 +125,11 @@ public interface HealthDAO {
 	/**
 	 * 이용상태 갱신
 	 * */
-	int updateUseDetail(int useDetailCode, int state) throws SQLException;
+	int updateUseDetail(int useDetailCode) throws SQLException;
 	
+	/**
+	 * 회원이 자신의 이용내역을 확인, 사업자가 자신의 헬스장 이용 신청을 확인할 때, 이용신청(state)가 유효한지(1인지) 확인하는 메소드
+	 * */
+	int checkUseDetailState() throws SQLException;
 	
 }
