@@ -18,7 +18,7 @@ import mind.util.DbUtil;
 public class HealthDAOImpl implements HealthDAO {
 	private Properties proFile = DbUtil.getProFile();
 	
-	
+	//트랜잭션 처리 - 참고 : C:\Edu\Java\JavaWorkSpace\step10_JDBC\src\ex1101\transaction
 	@Override
 	public int insertMember(MemberDTO member) throws SQLException {
 		Connection con = null;
@@ -52,8 +52,8 @@ public class HealthDAOImpl implements HealthDAO {
 		}catch (SQLException e) {
 			try {
 				con.rollback();
-			} catch (SQLException e2) {
-				throw new SQLException(e2.getMessage()); 
+			} catch (SQLException ex) {
+				throw new SQLException(ex.getMessage()); 
 			}
 		} finally {
 			DbUtil.dbClose(ps, con);
@@ -173,6 +173,66 @@ public class HealthDAOImpl implements HealthDAO {
 		} finally {
 			DbUtil.dbClose(ps, con);
 		}
+		return result;
+	}
+	
+	//트랜잭션 처리
+	@Override
+	public int updatePoint(String memberId, int gymCode, int price) throws SQLException{
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = proFile.getProperty("point.update");
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			
+			//고객 포인트 차감
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, (-1) * price);
+			ps.setString(2, memberId);
+			result = ps.executeUpdate();
+			ps.close();
+			String tempId = null;
+			if(result > 0) {
+				//짐 코드로 사업자 아이디 찾기
+				sql = proFile.getProperty("member.selectByGymCode");
+				ps = con.prepareStatement(sql);
+				ps.setInt(1, gymCode);
+				rs = ps.executeQuery();
+				ps.close();
+				if(rs.next()) {
+					tempId = rs.getString("id");
+					
+					//사업자 포인트 적립
+					ps = con.prepareStatement(sql);
+					ps.setInt(1, price);
+					ps.setString(2, tempId);
+					result = ps.executeUpdate();
+					
+					if(result > 0) {
+						con.commit();
+					}else {
+						con.rollback();						
+					}
+				}else {
+					con.rollback();
+				}
+			}else {
+				con.rollback();
+			}
+		} catch (SQLException e) {
+			try {
+				con.rollback();
+			} catch (SQLException ex) {
+				throw new SQLException(ex.getMessage());
+			}
+		} finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+
 		return result;
 	}
 

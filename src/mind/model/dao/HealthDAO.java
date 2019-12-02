@@ -49,6 +49,11 @@ public interface HealthDAO {
 	 * 포인트 잔액 갱신
 	 * */
 	int updatePoint(String memberId, int price) throws SQLException;
+		
+	/**
+	 * 회원 포인트 사용 및 사업자 포인트 적립
+	 * */
+	int updatePoint(String memberId, int gymCode, int price) throws SQLException;
 	
 	/**
 	 * 포인트 잔액 출력
