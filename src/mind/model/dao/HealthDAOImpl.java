@@ -2,6 +2,7 @@ package mind.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -41,26 +42,84 @@ public class HealthDAOImpl implements HealthDAO {
 
 	@Override
 	public MemberDTO selectMemberById(String id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = proFile.getProperty("member.selectById");
+		MemberDTO memberDTO = null;
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, id);
+			rs = ps.executeQuery();
+			
+			if(rs.next())
+				memberDTO = new MemberDTO(rs.getString("id"), rs.getString("name"), rs.getString("pwd"), rs.getString("phone_num"), rs.getInt("gym_code"));
+		} finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		return memberDTO;
 	}
 
 	@Override
 	public int updateMember(MemberDTO member) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("member.update");
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, member.getPwd());
+			ps.setString(2, member.getPhoneNum());
+			ps.setString(3, member.getId());
+			
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
 	public int deleteMember(String id) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		Connection con = null;
+		PreparedStatement ps = null;
+		int result = 0;
+		String sql = proFile.getProperty("member.delete");
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, id);
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
 	public boolean duplicateById(String id) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean result = false;
+		String sql = proFile.getProperty("member.selectById");
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, id);
+			rs = ps.executeQuery();
+			
+			if(rs.next())
+				result = true;
+		}finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		return result;
 	}
 
 	@Override
