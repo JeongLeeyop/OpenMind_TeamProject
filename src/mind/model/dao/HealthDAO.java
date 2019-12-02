@@ -40,9 +40,14 @@ public interface HealthDAO {
 	//////////////////////////////////////////////////////////////////////////
 	
 	/**
+	 * 포인트 레코드 초기화
+	 * */
+	public int insertPoint(String memberId) throws SQLException;
+	
+	/**
 	 * 포인트 잔액 갱신
 	 * */
-	int updatePoint(String memberId) throws SQLException;
+	int updatePoint(String memberId, int price) throws SQLException;
 	
 	/**
 	 * 포인트 잔액 출력
