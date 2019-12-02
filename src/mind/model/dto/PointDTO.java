@@ -1,7 +1,7 @@
 package mind.model.dto;
 
 public class PointDTO {
-	private String MemberId; //유저 아이디
+	private String memberId; //유저 아이디
 	private int balance; //잔액 소수점 없는 것 같아서 인트로했어요~
 
 	/**
@@ -14,7 +14,7 @@ public class PointDTO {
 	 * */
 	public PointDTO(String memberId, int balance) {
 		super();
-		MemberId = memberId;
+		this.memberId = memberId;
 		this.balance = balance;
 	}
 
@@ -26,11 +26,11 @@ public class PointDTO {
 	
 	//setter getter
 	public String getMemberId() {
-		return MemberId;
+		return memberId;
 	}
 
 	public void setMemberId(String memberId) {
-		MemberId = memberId;
+		this.memberId = memberId;
 	}
 
 	public int getBalance() {
