@@ -1,5 +1,6 @@
 package mind.model.dao;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public interface HealthDAO {
 	/**
 	 * 포인트 레코드 초기화
 	 * */
-	public int insertPoint(String memberId) throws SQLException;
+	public int insertPoint(String memberId, Connection con) throws SQLException;
 	
 	/**
 	 * 포인트 잔액 갱신

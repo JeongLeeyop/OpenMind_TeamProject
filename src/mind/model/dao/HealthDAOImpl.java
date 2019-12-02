@@ -18,6 +18,7 @@ import mind.util.DbUtil;
 public class HealthDAOImpl implements HealthDAO {
 	private Properties proFile = DbUtil.getProFile();
 	
+	
 	@Override
 	public int insertMember(MemberDTO member) throws SQLException {
 		Connection con = null;
@@ -27,6 +28,8 @@ public class HealthDAOImpl implements HealthDAO {
 		
 		try {
 			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			
 			ps = con.prepareStatement(sql);
 			ps.setString(1, member.getId());
 			ps.setString(2, member.getPwd());
@@ -35,6 +38,23 @@ public class HealthDAOImpl implements HealthDAO {
 			ps.setInt(5, member.getGymCode());
 			
 			result = ps.executeUpdate();
+			
+			if(result > 0) {
+				result = insertPoint(member.getId(), con);
+				if(result > 0)
+					con.commit();
+				else
+					con.rollback();
+			}else {
+				con.rollback();
+			}
+			
+		}catch (SQLException e) {
+			try {
+				con.rollback();
+			} catch (SQLException e2) {
+				throw new SQLException(e2.getMessage()); 
+			}
 		} finally {
 			DbUtil.dbClose(ps, con);
 		}
@@ -123,21 +143,15 @@ public class HealthDAOImpl implements HealthDAO {
 		return result;
 	}
 
-	//point insert 필요
-	public int insertPoint(String memberId) throws SQLException{
-		Connection con = null;
+	@Override
+	public int insertPoint(String memberId, Connection con) throws SQLException {
 		PreparedStatement ps = null;
 		String sql = proFile.getProperty("point.insert");
 		int result = 0;
 		
-		try {
-			con = DbUtil.getConnection();
-			ps = con.prepareStatement(sql);
-			ps.setString(1, memberId);
-			result = ps.executeUpdate();
-		} finally {
-			DbUtil.dbClose(ps, con);
-		}
+		ps = con.prepareStatement(sql);
+		ps.setString(1, memberId);
+		result = ps.executeUpdate();
 		return result;
 	}
 	
