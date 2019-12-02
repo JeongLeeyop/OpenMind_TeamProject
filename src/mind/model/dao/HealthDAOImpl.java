@@ -1,21 +1,42 @@
 package mind.model.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 import mind.model.dto.GymDTO;
 import mind.model.dto.MemberDTO;
 import mind.model.dto.PointDTO;
 import mind.model.dto.ReviewDTO;
 import mind.model.dto.UseDetailDTO;
+import mind.util.DbUtil;
 
 public class HealthDAOImpl implements HealthDAO {
-
+	private Properties proFile = DbUtil.getProFile();
+	
 	@Override
 	public int insertMember(MemberDTO member) throws SQLException {
 		Connection con = null;
-		return 0;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("member.insert");
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, member.getId());
+			ps.setString(2, member.getPwd());
+			ps.setString(3, member.getName());
+			ps.setString(4, member.getPhoneNum());
+			ps.setInt(5, member.getGymCode());
+			
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
