@@ -18,6 +18,7 @@ import mind.util.DbUtil;
 public class HealthDAOImpl implements HealthDAO {
 	private Properties proFile = DbUtil.getProFile();
 	
+	//트랜잭션 처리 - 참고 : C:\Edu\Java\JavaWorkSpace\step10_JDBC\src\ex1101\transaction
 	@Override
 	public int insertMember(MemberDTO member) throws SQLException {
 		Connection con = null;
@@ -27,6 +28,8 @@ public class HealthDAOImpl implements HealthDAO {
 		
 		try {
 			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			
 			ps = con.prepareStatement(sql);
 			ps.setString(1, member.getId());
 			ps.setString(2, member.getPwd());
@@ -35,6 +38,23 @@ public class HealthDAOImpl implements HealthDAO {
 			ps.setInt(5, member.getGymCode());
 			
 			result = ps.executeUpdate();
+			
+			if(result > 0) {
+				result = insertPoint(member.getId(), con);
+				if(result > 0)
+					con.commit();
+				else
+					con.rollback();
+			}else {
+				con.rollback();
+			}
+			
+		}catch (SQLException e) {
+			try {
+				con.rollback();
+			} catch (SQLException ex) {
+				throw new SQLException(ex.getMessage()); 
+			}
 		} finally {
 			DbUtil.dbClose(ps, con);
 		}
@@ -123,21 +143,15 @@ public class HealthDAOImpl implements HealthDAO {
 		return result;
 	}
 
-	//point insert 필요
-	public int insertPoint(String memberId) throws SQLException{
-		Connection con = null;
+	@Override
+	public int insertPoint(String memberId, Connection con) throws SQLException {
 		PreparedStatement ps = null;
 		String sql = proFile.getProperty("point.insert");
 		int result = 0;
 		
-		try {
-			con = DbUtil.getConnection();
-			ps = con.prepareStatement(sql);
-			ps.setString(1, memberId);
-			result = ps.executeUpdate();
-		} finally {
-			DbUtil.dbClose(ps, con);
-		}
+		ps = con.prepareStatement(sql);
+		ps.setString(1, memberId);
+		result = ps.executeUpdate();
 		return result;
 	}
 	
@@ -159,6 +173,66 @@ public class HealthDAOImpl implements HealthDAO {
 		} finally {
 			DbUtil.dbClose(ps, con);
 		}
+		return result;
+	}
+	
+	//트랜잭션 처리
+	@Override
+	public int updatePoint(String memberId, int gymCode, int price) throws SQLException{
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = proFile.getProperty("point.update");
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			con.setAutoCommit(false);
+			
+			//고객 포인트 차감
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, (-1) * price);
+			ps.setString(2, memberId);
+			result = ps.executeUpdate();
+			ps.close();
+			String tempId = null;
+			if(result > 0) {
+				//짐 코드로 사업자 아이디 찾기
+				sql = proFile.getProperty("member.selectByGymCode");
+				ps = con.prepareStatement(sql);
+				ps.setInt(1, gymCode);
+				rs = ps.executeQuery();
+				ps.close();
+				if(rs.next()) {
+					tempId = rs.getString("id");
+					
+					//사업자 포인트 적립
+					ps = con.prepareStatement(sql);
+					ps.setInt(1, price);
+					ps.setString(2, tempId);
+					result = ps.executeUpdate();
+					
+					if(result > 0) {
+						con.commit();
+					}else {
+						con.rollback();						
+					}
+				}else {
+					con.rollback();
+				}
+			}else {
+				con.rollback();
+			}
+		} catch (SQLException e) {
+			try {
+				con.rollback();
+			} catch (SQLException ex) {
+				throw new SQLException(ex.getMessage());
+			}
+		} finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+
 		return result;
 	}
 
