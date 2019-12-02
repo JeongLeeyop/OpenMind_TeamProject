@@ -3,7 +3,7 @@ package mind.model.dto;
 public class ReviewDTO {
 	
 	private int code;	//리뷰 PK 시퀀스라 int로 선언
-	private String MemberId; //유저Id -> 작성자
+	private String memberId; //유저Id -> 작성자
 	private String regDate; //리뷰게시물 등록일 이거 데이트로 선언해야하나요??
 	private double starScore; //별점 소수점으로 등록가능할 것 같아서 더블로 선언
 	private String content; //리뷰 게시물 내용
@@ -23,7 +23,7 @@ public class ReviewDTO {
 			int gymCode) {
 		super();
 		this.code = code;
-		MemberId = memberId;
+		this.memberId = memberId;
 		this.regDate = regDate;
 		this.starScore = starScore;
 		this.content = content;
@@ -50,11 +50,11 @@ public class ReviewDTO {
 	}
 
 	public String getMemberId() {
-		return MemberId;
+		return memberId;
 	}
 
 	public void setMemberId(String memberId) {
-		MemberId = memberId;
+		this.memberId = memberId;
 	}
 
 	public String getRegDate() {

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -148,8 +149,41 @@ public class HealthDAOImpl implements HealthDAO {
 
 	@Override
 	public List<GymDTO> selectGymByKeyword(String keyField, String keyword) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("gym.selectByKeyword");//gym.selectByKeyword=SELECT CODE, NAME, ADDR, PHONE_NUM, FILE_NAME, GYM_CAPACITY, PRICE, GYM_COMMENT, WEEKDAY_HOUR, WEEKEND_HOUR, STAR_SCORE FROM GYM WHERE ? LIKE ?
+		ResultSet rs = null;
+		List<GymDTO> list = new ArrayList<GymDTO>();
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, keyField);
+			ps.setString(2, "%"+keyword+"%");
+			rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				int code = rs.getInt("CODE");
+				String name = rs.getString("NAME");
+				
+				String addr = rs.getString("ADDR");
+				String phoneNum = rs.getString("PHONE_NUM");
+				String fileName = rs.getString("FILE_NAME");
+				int gymCapacity = rs.getInt("GYM_CAPACITY");
+				int price = rs.getInt("PRICE");
+				String comment = rs.getString("GYM_COMMENT");
+				String weekdayHour = rs.getString("WEEKDAY_HOUR");
+				String weekendHour = rs.getString("WEEKEND_HOUR");
+				double avgScore = rs.getDouble("STAR_SCORE");
+				
+				GymDTO gym = new GymDTO(code, name, addr, phoneNum, fileName, gymCapacity, price, comment, weekdayHour, weekendHour, avgScore);
+				list.add(gym);
+			}
+			
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return list;
 	}
 
 	@Override
