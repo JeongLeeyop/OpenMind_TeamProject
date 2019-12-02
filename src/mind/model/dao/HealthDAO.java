@@ -96,7 +96,7 @@ public interface HealthDAO {
 	/**
 	 * 리뷰 삭제
 	 * */
-	int deleteReview(int reviewCode) throws SQLException;
+	int deleteReview(int reviewCode, String memberId) throws SQLException;
 	
 	/////////////////////////////////////////////////////////////////////
 	
@@ -119,7 +119,11 @@ public interface HealthDAO {
 	/**
 	 * 이용상태 갱신
 	 * */
-	int updateUseDetail(int useDetailCode, int state) throws SQLException;
+	int updateUseDetail(int useDetailCode) throws SQLException;
 	
+	/**
+	 * 회원이 자신의 이용내역을 확인, 사업자가 자신의 헬스장 이용 신청을 확인할 때, 이용신청(state)가 유효한지(1인지) 확인하는 메소드
+	 * */
+	int checkUseDetailState() throws SQLException;
 	
 }

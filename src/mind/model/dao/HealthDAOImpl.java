@@ -339,7 +339,7 @@ public class HealthDAOImpl implements HealthDAO {
 			ps.setInt(1, review.getGymCode());
 			ps.setString(2, review.getMemberId());
 			ps.setDouble(3, review.getStarScore());
-			ps.setString(4, review.getContent()); //여기부터
+			ps.setString(4, review.getContent()); 
 			ps.setString(5, review.getFileName());
 
 			result = ps.executeUpdate();
@@ -384,38 +384,173 @@ public class HealthDAOImpl implements HealthDAO {
 
 	@Override
 	public int updateReview(ReviewDTO review) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("review.update"); //UPDATE REVIEW SET STAR_SCORE = ?, CONTENT = ?, FILE_NAME = ? WHERE CODE = ? AND MEMBER_ID = ?
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setDouble(1, review.getStarScore());
+			ps.setString(2, review.getContent());
+			ps.setString(3, review.getFileName());
+			ps.setInt(4, review.getCode()); 
+			ps.setString(5, review.getMemberId());
+
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
-	public int deleteReview(int reviewCode) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int deleteReview(int reviewCode, String memberId) throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("review.delete"); //DELETE FROM REVIEW WHERE CODE = ? AND MEMBER_ID = ?
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, reviewCode);
+			ps.setString(2, memberId);
+			
+
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
 	public int insertUseDetail(UseDetailDTO useDetail) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("useDetail.insert"); //INSERT INTO USE_DETAIL(CODE, MEMBER_ID, GYM_CODE, PRICE, USE_START_HOUR, STATE) SELECT USE_DETAIL_SEQ.NEXTVAL, MEMBER.ID, GYM.CODE, GYM.PRICE, SYSDATE, 1 FROM MEMBER, GYM WHERE MEMBER.ID = ? AND GYM.CODE = ?
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setString(1, useDetail.getMemberId());
+			ps.setInt(2, useDetail.getGymCode());
+			
+
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 	@Override
 	public List<UseDetailDTO> selectUseDetailByKeyword(String keyField, String keyword) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		String sql = proFile.getProperty("useDetail.selectByKeyword"); //SELECT CODE, MEMBER_ID, GYM_CODE, PRICE, USE_START_HOUR, STATE FROM USE_DETAIL WHERE ? = ?
+		sql.replaceFirst("?", keyField);
+		ResultSet rs = null;
+		List<UseDetailDTO> list = new ArrayList<UseDetailDTO>();
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+
+			ps.setString(1, keyword);
+			rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				int code = rs.getInt("CODE");
+				String memberId = rs.getString("MEMBER_ID");
+				int gymCode = rs.getInt("GYM_CODE");
+				int price = rs.getInt("PRICE");
+				String useStartHour = rs.getString("USE_START_HOUR");
+				int state = rs.getInt("STATE");
+						
+				UseDetailDTO useDetail = new UseDetailDTO(code, memberId, gymCode, price, useStartHour, state);
+				list.add(useDetail);
+			}
+			
+		} finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		return list;
 	}
 
 	@Override
 	public List<UseDetailDTO> selectUseDetailByGymCodeState(int gymCode, int state) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("useDetail.selectByGymCodeState"); //SELECT CODE, MEMBER_ID, GYM_CODE, PRICE, USE_START_HOUR, STATE FROM USE_DETAIL WHERE GYM_CODE = ? AND STATE = 1
+		ResultSet rs = null;
+		List<UseDetailDTO> list = new ArrayList<UseDetailDTO>();
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, gymCode);
+			rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				int code = rs.getInt("CODE");
+				String memberId = rs.getString("MEMBER_ID");
+				int gCode = rs.getInt("GYM_CODE");  // gymCode는 매개변수로 들어오는 값이랑 같아서 변수이름 gCode로 변경
+				int price = rs.getInt("PRICE");
+				String useStartHour = rs.getString("USE_START_HOUR");
+				int st = rs.getInt("STATE"); //state는 매개변수로 들어오는 값이랑 같아서 변수이름 st로 변경
+						
+				UseDetailDTO useDetail = new UseDetailDTO(code, memberId, gCode, price, useStartHour, st);
+				list.add(useDetail);
+			}
+			
+		} finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		return list;
 	}
 
 	@Override
-	public int updateUseDetail(int useDetailCode, int state) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int updateUseDetail(int useDetailCode) throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("useDetail.updateToUsed"); //UPDATE USE_DETAIL SET STATE = 0 WHERE CODE = ?
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, useDetailCode);
+			
+			
+
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
+	}
+	
+	@Override
+	public int checkUseDetailState() throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		String sql = proFile.getProperty("useDetail.updateToUsed"); //UPDATE USE_DETAIL SET STATE = CASE WHEN SYSDATE - TO_DATE(USE_START_HOUR) > 1.0 THEN -1 ELSE 1 END
+		int result = 0;
+		
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+
+			result = ps.executeUpdate();
+		} finally {
+			DbUtil.dbClose(ps, con);
+		}
+		return result;
 	}
 
 }
