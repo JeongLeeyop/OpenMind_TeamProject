@@ -96,7 +96,7 @@ public class HealthService {
 	/**
 	 * 헬스장 조건 검색
 	 * */
-	public List<GymDTO> selectGymByKeyword(String keyField, String keyword) throws SQLException {
+	public static List<GymDTO> selectGymByKeyword(String keyField, String keyword) throws SQLException {
 		List<GymDTO> list = healthDAO.selectGymByKeyword(keyField, keyword);
 		return list;
 	}

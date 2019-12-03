@@ -34,7 +34,7 @@ public class HandlerMappingListener implements ServletContextListener {
 				// System.out.println(key +" = "+value);
 				// String 을 -> 객체로 생성한다.
 				HealthController con = (HealthController) Class.forName(value).newInstance();
-//	    		System.out.println(con);
+	    		System.out.println(con);
 				map.put(key, con);
 			}
 		} catch (Exception ex) {
