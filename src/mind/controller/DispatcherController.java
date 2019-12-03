@@ -1,7 +1,6 @@
 package mind.controller;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -29,11 +28,11 @@ public class DispatcherController extends HttpServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// command = view에서 name=command
 		String key = request.getParameter("command");
-//		System.out.println(key);
+		System.out.println(key);
 
-		if (key == null) {
-			key = "list";
-		}
+		/*
+		 * if (key == null) { key = "list"; }
+		 */
 		
 		try {
 			ModelAndView mv = map.get(key).handleRequest(request, response);
