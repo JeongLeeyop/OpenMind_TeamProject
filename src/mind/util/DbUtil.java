@@ -1,6 +1,8 @@
 package mind.util;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,21 +20,25 @@ import javax.sql.DataSource;
 public class DbUtil {
 	private static DataSource ds;
 	private static Properties proFile = new Properties();
+
 	/**
 	 * 로드
 	 */
-	static {
+    static {
 		try {
-			proFile.load(new FileInputStream("src/mind/util/DbSql.properties"));
-					
+			Class clazz = DbUtil.class;		
+			proFile.load(clazz.getResourceAsStream("DbSql.properties"));
+			
 			Context context = new InitialContext();
 			ds = (DataSource) context.lookup("java:/comp/env/jdbc/myoracle");// context.xml 파일에 name이랑 같은지 확인해주세요!
+			System.out.println("ds : " + ds);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public static Properties getProFile() {
+		
 		return proFile;
 	}
 
